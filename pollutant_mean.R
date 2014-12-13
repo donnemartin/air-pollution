@@ -27,11 +27,12 @@ PollutantMean <- function(directory, pollutant, id=1:332) {
          pollutant, ".")
   }
 
-  listOfDataFrames <- generateDataFramesFromCSV(directory, id)
+  listOfDataFrames <- GenerateDataFramesFromCSV(directory, id)
 
   # Generate a single dataframe from our list of data frames
   df <- ldply(listOfDataFrames)
 
+  # Calculate the mean and place the results in a vector
   pollutantMean <- mean(df[, pollutant], na.rm=TRUE)
   return(pollutantMean)
 }

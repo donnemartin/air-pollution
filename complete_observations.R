@@ -20,13 +20,12 @@ CompleteObservations <- function(directory, id=1:332) {
 
   source("utils.R")
 
-  listOfDataFrames <- generateDataFramesFromCSV(directory, id)
+  listOfDataFrames <- GenerateDataFramesFromCSV(directory, id)
 
   # Generate a data frame of observations per file
   dfObservations <- ldply(listOfDataFrames,
                           function(x) {
-                            numObs <- nrow(na.omit(x))
-                            return(numObs)
+                            return(nrow(na.omit(x)))
                           })
 
   # Generate a data frame of file ids
@@ -35,45 +34,34 @@ CompleteObservations <- function(directory, id=1:332) {
                      return(x)
                    })
 
-  # Determine the correlation
-  # Uses casewise deletion for missing values
-  # If there are no complete cases, return NA
-  dfCorrelation <- ldply(listOfDataFrames,
-                        function(x) {
-                          correlation <- cor(x[, "sulfate"],
-                                               x[, "nitrate"],
-                                               use="na.or.complete")
-                          return(correlation)
-                        })
-
-  dfCompleteObservations <- data.frame(dfFiles, dfObservations, dfCorrelation)
+  dfCompleteObservations <- data.frame(dfFiles, dfObservations)
 
   # Rename the default columns to be more descriptive
   dfCompleteObservations <- rename(dfCompleteObservations,
-                                   c("V1"="id", "V1.1"="nobs", "V1.2"="cor"))
+                                   c("V1"="id", "V1.1"="nobs"))
   return(dfCompleteObservations)
 }
 
 # Tests
 # TODO: Add RUnit or testthat unit test
 CompleteObservations("specdata", 1)
-# id nobs        cor
-# 1  1  117 -0.2225526
+# id nobs
+# 1  1  117
 CompleteObservations("specdata", c(2, 4, 8, 10, 12))
-# id nobs         cor
-# 1  2 1041 -0.01895754
-# 2  4  474 -0.04389737
-# 3  8  192 -0.15967365
-# 4 10  148  0.16137933
-# 5 12   96 -0.07881378
+# id nobs
+# 1  2 1041
+# 2  4  474
+# 3  8  192
+# 4 10  148
+# 5 12   96
 CompleteObservations("specdata", 30:25)
-# id nobs        cor
-# 1 30  932 0.05774168
-# 2 29  711 0.72669389
-# 3 28  475 0.00686393
-# 4 27  338 0.58075126
-# 5 26  586 0.36620108
-# 6 25  463 0.13327461
+# id nobs
+# 1 30  932
+# 2 29  711
+# 3 28  475
+# 4 27  338
+# 5 26  586
+# 6 25  463
 CompleteObservations("specdata", 3)
-# id nobs        cor
-# 1  3  243 -0.1405125
+# id nobs
+# 1  3  243

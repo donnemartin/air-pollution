@@ -1,4 +1,4 @@
-generateDataFramesFromCSV <- function(directory, id) {
+GenerateDataFramesFromCSV <- function(directory, id) {
   # Takes a directory and csv file ids and returns a list of data frames
   # containing the contents of each csv per data frame
   #
