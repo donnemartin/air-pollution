@@ -38,7 +38,6 @@ PollutantMean <- function(directory, pollutant, id=1:332) {
 }
 
 # Tests
-# TODO: Add RUnit or testthat unit test
 PollutantMean("specdata", "sulfate", 1:10)
 # [1] 4.064
 PollutantMean("specdata", "nitrate", 70:72)
