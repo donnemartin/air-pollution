@@ -10,10 +10,12 @@ GenerateDataFramesFromCSV <- function(directory, id) {
   # Returns:
   #   A list of data frames containing the contents of each csv per data frame
 
+  library(plyr)
+
   fileNames <- sprintf("%03d.csv", id)
   filePaths <- paste(directory, fileNames, sep="/")
 
   # Generate a list of dataframes, one for each csv
-  dfList <- lapply(filePaths, read.csv)
+  dfList <- llply(filePaths, read.csv)
   return(dfList)
 }
