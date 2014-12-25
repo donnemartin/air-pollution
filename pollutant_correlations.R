@@ -23,51 +23,62 @@ PollutantCorrelation <- function(directory, threshold=0) {
   # Get a list of files with completed observations within our threshold
   kMaxMonitors <- 332
   dfCompleteObs <- CompleteObservations("specdata", 1:kMaxMonitors)
-  dfCompleteObs <- subset(dfCompleteObs, nobs > threshold)
+  dfCompleteObsInThreshold <- subset(dfCompleteObs, numObs > threshold)
+
+  # If no monitors meet the threshold requirements, return a numeric
+  # vector of length 0
+  if (nrow(dfCompleteObsInThreshold) == 0) {
+    return(c(0))
+  }
 
   # Load the data for files that match our threshold
-  completeObsIds <- dfCompleteObs[, "id"]
-  listOfDataFrames <- GenerateDataFramesFromCSV(directory, completeObsIds)
+  # TODO: CompleteObservations already loads the data, address this
+  # double file data load performance hit
+  obsInThreshold <- dfCompleteObsInThreshold[, "id"]
+  listOfDataFrames <- GenerateDataFramesFromCSV(directory, obsInThreshold)
 
   # Determine the correlation
   # Uses casewise deletion for missing values
   # If there are no complete cases, return NA
   dfCorrelation <- ldply(listOfDataFrames,
-                         function(x) {
-                           correlation <- cor(x[, "sulfate"],
-                                              x[, "nitrate"],
+                         function(list) {
+                           correlation <- cor(list[, "sulfate"],
+                                              list[, "nitrate"],
                                               use="na.or.complete")
                            return(correlation)
                          })
 
-  # "V1" is the default column name
+  # Change the column names to something more manageable
+  colnames(dfCorrelation) <- c("corr")
+
   # Build the vector of correlations
-  correlations <- dfCorrelation[, "V1"]
+  correlations <- dfCorrelation[, "corr"]
+
   return(correlations)
 }
 
-# TODO: Add RUnit or testthat unit test
 # Tests
-cr <- corr("specdata", 150)
+cr <- PollutantCorrelation("specdata", 150)
 head(cr)
-## [1] -0.01896 -0.14051 -0.04390 -0.06816 -0.12351 -0.07589
+# [1] -0.01896 -0.14051 -0.04390 -0.06816 -0.12351 -0.07589
 summary(cr)
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
-## -0.2110 -0.0500  0.0946  0.1250  0.2680  0.7630
-cr <- corr("specdata", 400)
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+# -0.2110 -0.0500  0.0946  0.1250  0.2680  0.7630
+cr <- PollutantCorrelation("specdata", 400)
 head(cr)
-## [1] -0.01896 -0.04390 -0.06816 -0.07589  0.76313 -0.15783
+# [1] -0.01896 -0.04390 -0.06816 -0.07589  0.76313 -0.15783
 summary(cr)
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
-## -0.1760 -0.0311  0.1000  0.1400  0.2680  0.7630
-cr <- corr("specdata", 5000)
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+# -0.1760 -0.0311  0.1000  0.1400  0.2680  0.7630
+cr <- PollutantCorrelation("specdata", 5000)
 summary(cr)
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
-##
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+#    0       0       0       0       0       0
 length(cr)
-## [1] 0
-cr <- corr("specdata")
+# [1] 0
+cr <- PollutantCorrelation("specdata")
 summary(cr)
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
-## -1.0000 -0.0528  0.1070  0.1370  0.2780  1.0000
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+# -1.0000 -0.0528  0.1070  0.1370  0.2780  1.0000
 length(cr)
+# [1] 323
