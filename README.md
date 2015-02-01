@@ -1,3 +1,5 @@
+![alt text](http://donnemartin.com/wp-content/uploads/2014/12/pollution_cover.jpg)
+
 # airpollution
 
 R scripts that analyze sulfate and nitrate pollution data from sensors monitoring fine particulate matter air pollution at 332 locations in the United States.
